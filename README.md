@@ -21,6 +21,13 @@
 
 https://maths-creativework-sio.netlify.app/ 
 
+**Few websites that I genuinely love:**
+
+- https://www.cameronsworld.net/ 
+- https://monkeytype.com/
+- https://bored.com/
+
+
 **A meme that captures how I currently feel about my university studies is:** 
 
 ![rage-throw](https://github.com/user-attachments/assets/ecd1ede6-e25b-43a7-b303-0892b8749493) 
