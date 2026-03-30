@@ -1,0 +1,127 @@
+---
+title: My dynamic report
+output: html_fragment
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo=FALSE, message=FALSE, warning=FALSE, error=FALSE)
+```
+
+```{css}
+body {
+  background: #1A1A1A;
+  color: #FFFFFF;
+  font-family: 'Helvetica', Arial, sans-serif;
+  max-width: 850px;
+  margin: auto;
+  line-height: 1.7;
+  padding: 20px;
+}
+
+h2 {
+  font-weight: 500;
+  font-size: 2.2rem;
+  color: #2EC4B6; 
+  border-bottom: 2px solid #2EC4B6;
+  padding-bottom: 10px;
+  margin-top: 40px;
+}
+
+h3 {
+  font-weight: 400;
+  font-size: 1.5rem;
+  color: #FF9F1C; /* coffee */
+  margin-top: 30px;
+}
+
+
+p {
+  font-weight: 300;
+  font-size: 1.1rem;
+  color: #FFFFFF;
+  text-align: left;
+}
+
+strong {
+  color: #2EC4B6;
+  font-weight: 600;
+}
+
+img {
+  display: block;
+  margin: 30px auto;
+  box-shadow: 0 4px 15px #333; 
+  border: 1px solid #333;
+  max-width: 100%;
+  height: auto;
+}
+```
+
+## What's going on with this data?
+
+This report provides a live analysis of caffeine habits by connecting directly to an observational log. To ensure consistency, raw survey data is processed into standardized variables. I decided to focus on two main metrics which are:
+
+### Total observations: 
+
+Tracking the scale of the study.
+
+### Average Focus:
+
+Measuring beverage effectiveness via arithmetic mean.
+
+As new data is logged via the Google Form created, these bar charts and summaries update in real time.
+
+```{r}
+# PART C
+library(tidyverse)
+csv_url <- "https://docs.google.com/spreadsheets/d/e/2PACX-1vTcFY_j3pECqJaJl5vvJ_RXgNIGjQQgr6dBa8NCgcrK6U-aTFXIBRGRxhoYs-BKVio54KVqtdyD0BzW/pub?gid=115883477&single=true&output=csv"
+
+logged_data <- read_csv(csv_url)
+
+latest_data <- logged_data %>%
+  rename(
+    timestamp = 1,
+    drink_name = 2,
+    type = 3,
+    servings = 4,
+    time_of_day = 5,
+    reason = 6,
+    focus_score = 7
+  )
+
+# PART D
+total_observation <- nrow(latest_data)
+
+avg_focus <- round(mean(latest_data$focus_score, na.rm = TRUE), 2)
+
+common_time <- latest_data %>% 
+  count(time_of_day) %>% 
+  slice_max(n, n = 1) %>% 
+  pull(time_of_day)
+
+# BAR CHART 1
+ggplot(latest_data, aes(x=type, fill=type)) +
+  geom_bar() +
+  labs(
+    title = "Frequency of Different Drink Types Observed",
+    subtitle = paste("Based On", total_observation, "total logs"),
+    x = "Drinks",
+    y = "Number of Times Consumed") +
+  theme_grey() +
+  scale_fill_brewer(palette = "Set2") +
+  theme(legend.position = "none")
+
+
+#BAR CHART 2 
+ggplot(latest_data, aes(x = time_of_day, fill = time_of_day)) +
+  geom_bar() +
+  labs(
+    title = "Caffeine Consumption Patterns by Time of Day",
+    x = "Time Period",
+    y = "Count") +
+  theme_grey() +
+  coord_flip() + #makes word not crowded in usual bar chart / flip
+  theme(legend.position = "none")
+```
+
+So far, I have recorded **`r total_observation`** total drinks. On average, the average focus score after drinking is **`r avg_focus`** out of 5. It seems everyone including me is most likely to grab a drink during **`r common_time`**.
